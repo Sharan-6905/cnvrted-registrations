@@ -1,0 +1,323 @@
+@import "tailwindcss";
+
+/**
+ * CNVRTED Design System — Global Styles
+ *
+ * Architecture (Tailwind v4):
+ *   @theme inline  →  defines all design tokens as CSS custom properties AND
+ *                     generates Tailwind utility classes that reference them.
+ *                     Because @theme inline is used (not @theme), utilities
+ *                     output var(--token) references, enabling runtime overrides.
+ *
+ *   [data-theme="dark"]  →  overrides the relevant --color-* and --color-accent
+ *                            variables for the How It Works dark section. All
+ *                            components using bg-background, text-text-primary etc.
+ *                            automatically use dark values inside this attribute.
+ *                            No Tailwind dark: prefix needed anywhere.
+ *
+ * Token naming follows the design system (docs/04-design-system.md).
+ * No raw hex values appear in component files — only token names via Tailwind utilities
+ * or var(--token-name) in the rare case of inline styles.
+ */
+
+/* ─── Tailwind v4 Deviation Note ──────────────────────────────────────────────
+ * The implementation plan specified tailwind.config.ts (v3 syntax).
+ * create-next-app@latest installed Tailwind v4, which replaces the JS config
+ * file with @theme directives in CSS. The resulting architecture is cleaner:
+ * - CSS custom properties and Tailwind utilities share a single definition
+ * - No var() indirection needed in a separate config file
+ * - @theme inline means dark-section overrides work via CSS cascade alone
+ * All token names, hex values, and utility class semantics are identical to
+ * the plan. The file that changed is this one (globals.css), not the design system.
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+@theme inline {
+
+  /* ── Fonts ─────────────────────────────────────────────────────────────── */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  /* ── Color — Light Mode ─────────────────────────────────────────────────── */
+  --color-background:          #FAF8F4;   /* Warm cream */
+  --color-surface:             #F2EFE9;   /* Slightly deeper cream for card backgrounds */
+  --color-surface-raised:      #FFFFFF;   /* Pure white for elevated card faces */
+  --color-border:              #E4DFD6;   /* Warm grey border */
+
+  --color-text-primary:        #0D1210;   /* Warm near-black */
+  --color-text-secondary:      #4A5250;   /* Warm mid-grey */
+  --color-text-tertiary:       #8A9490;   /* Muted label grey */
+
+  --color-accent:              #0B6B66;   /* Deep teal */
+  --color-accent-hover:        #085c57;   /* 10% darker for hover */
+  --color-accent-link:         #085c57;
+  --color-accent-dim:          #E6F4F1;   /* Mint tint for tag/badge backgrounds */
+
+  --color-intent-high-bg:      #0B6B66;   /* Solid teal for HIGH INTENT badge */
+  --color-intent-high-text:    #FFFFFF;
+  --color-intent-medium-bg:    #FEF3E2;   /* Warm amber tint for MEDIUM INTENT */
+  --color-intent-medium-text:  #92540A;
+
+  --color-success:             #1E9E6B;
+  --color-error:               #D93025;
+
+  /* ── Color — Dark Section Palette ──────────────────────────────────────── */
+  --color-dark-bg:             #031B1D;   /* Reference dark teal-black */
+  --color-dark-surface:        #0A2527;
+  --color-dark-border:         #1A3A3D;
+  --color-dark-text-primary:   #F0F5F4;
+  --color-dark-text-secondary: #8AADA9;
+  --color-dark-text-tertiary:  #4A6A67;
+  --color-accent-dark:         #2CC4BB;   /* Brightened teal for dark bg contrast */
+
+  /* ── Typography — Type Scale ────────────────────────────────────────────── */
+  /* Tailwind v4: --text-* sets font-size; --text-*--line-height is auto-applied.
+     Font-weight is NOT a supported sub-property — see @layer base block below.
+     h2 through mono-tag use clamp() for fluid mobile→desktop scaling (D3 fix).
+     text-display and text-h1 are static desktop values; components that need
+     responsive display/h1 sizing use .text-display-fluid / .text-h1-fluid. */
+
+  --text-display:           4.5rem;                                         /* 72px — static */
+  --text-display--line-height: 1.05;
+
+  --text-h1:                3rem;                                            /* 48px — static */
+  --text-h1--line-height:   1.1;
+
+  /* clamp(mobile, fluid, desktop) — breakpoints: 375px → 1280px */
+  --text-h2:                clamp(1.625rem, calc(1.1vw + 1.37rem), 2.25rem);   /* 26px → 36px */
+  --text-h2--line-height:   1.15;
+
+  --text-h3:                clamp(1.25rem, calc(0.44vw + 1.15rem), 1.5rem);    /* 20px → 24px */
+  --text-h3--line-height:   1.25;
+
+  --text-body-lg:           clamp(1.0625rem, calc(0.22vw + 1rem), 1.1875rem);  /* 17px → 19px */
+  --text-body-lg--line-height: 1.55;
+
+  --text-body:              clamp(0.9375rem, calc(0.11vw + 0.91rem), 1rem);    /* 15px → 16px */
+  --text-body--line-height: 1.6;
+
+  --text-caption:           clamp(0.75rem, calc(0.11vw + 0.72rem), 0.8125rem); /* 12px → 13px */
+  --text-caption--line-height: 1.4;
+
+  --text-mono-tag:          clamp(0.6875rem, calc(0.11vw + 0.66rem), 0.75rem); /* 11px → 12px */
+  --text-mono-tag--line-height: 1.3;
+
+  /* ── Border Radius ──────────────────────────────────────────────────────── */
+  /* Tailwind v4: --radius-* maps to rounded-{name} utility */
+  --radius-sm:    0.25rem;   /* 4px  — small interactive elements */
+  --radius-md:    0.5rem;    /* 8px  — buttons, tags, badges */
+  --radius-card:  0.75rem;   /* 12px — signal cards (distinct component) */
+  --radius-lg:    1rem;      /* 16px — general content cards, form containers */
+  --radius-xl:    1.5rem;    /* 24px — large containers (not on homepage) */
+
+  /* ── Shadows ─────────────────────────────────────────────────────────────── */
+  /* Tailwind v4: --shadow-* maps to shadow-{name} utility */
+  --shadow-card:       0px 2px 12px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0px 6px 20px rgba(0, 0, 0, 0.10);
+
+  /* ── Spacing — Semantic Scale (8px base — docs/04-design-system.md §4.1) ─── */
+  /* Generates Tailwind utilities: p-{name}, m-{name}, gap-{name}, w-{name}, etc. */
+  /* Components reference these by name — never raw px or arbitrary values.        */
+  --spacing-xs:   0.25rem;   /*   4px — icon margins, hairline gaps */
+  --spacing-sm:   0.5rem;    /*   8px — compact gaps, small internal padding */
+  --spacing-md:   0.75rem;   /*  12px — tag/badge padding, tight component gaps */
+  --spacing-lg:   1rem;      /*  16px — standard component internal padding */
+  --spacing-xl:   1.5rem;    /*  24px — comfortable content spacing, card padding */
+  --spacing-2xl:  2rem;      /*  32px — between sibling components */
+  --spacing-3xl:  3rem;      /*  48px — section sub-rhythm, generous gaps */
+  --spacing-4xl:  4rem;      /*  64px — section-mobile vertical padding */
+  --spacing-5xl:  6rem;      /*  96px — large layout separations */
+  --spacing-6xl:  8rem;      /* 128px — section-desktop vertical padding */
+  --spacing-7xl:  12rem;     /* 192px — hero min-height, maximum layout gaps */
+
+  /* ── Spacing — Context Aliases ──────────────────────────────────────────── */
+  /* Named aliases for readability at the section/layout level.                  */
+  --spacing-section-desktop:  8rem;    /* 128px = spacing-6xl */
+  --spacing-section-tablet:   5rem;    /* 80px  — no direct alias in base scale */
+  --spacing-section-mobile:   4rem;    /* 64px  = spacing-4xl */
+  --spacing-container-x:      5rem;    /* 80px  — outer horizontal margin, desktop */
+  --spacing-container-x-sm:   1.5rem;  /* 24px  = spacing-xl — mobile */
+
+}
+
+/* ─── Dark Section Token Override ─────────────────────────────────────────────
+ * Applied to the How It Works section via data-theme="dark".
+ * All standard --color-* tokens are reassigned to their dark-palette equivalents.
+ * Components inside this element use bg-background, text-text-primary, etc.
+ * unchanged — they automatically resolve to dark values via CSS cascade.
+ * ─────────────────────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  --color-background:     #031B1D;
+  --color-surface:        #0A2527;
+  --color-surface-raised: #0F2E31;
+  --color-border:         #1A3A3D;
+
+  --color-text-primary:   #F0F5F4;
+  --color-text-secondary: #8AADA9;
+  --color-text-tertiary:  #4A6A67;
+
+  --color-accent:         #2CC4BB;
+  --color-accent-link:    #2CC4BB;
+  --color-accent-dim:     rgba(44, 196, 187, 0.12);
+}
+
+/* ─── Base Reset ───────────────────────────────────────────────────────────────
+ * Minimal — Tailwind's preflight handles most resets.
+ * Only additions that Tailwind v4 preflight does not cover.
+ * ─────────────────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Smooth scroll for anchor navigation (nav links → sections).
+     JS smooth-scroll is applied for controlled duration; CSS scroll-behavior
+     handles the rare cases where JS hasn't initialized yet. */
+  scroll-behavior: smooth;
+  /* Prevent horizontal overflow on mobile */
+  overflow-x: hidden;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent layout shift from scrollbar appearing on content-heavy sections */
+  scrollbar-gutter: stable;
+}
+
+/* ─── Typography Defaults ──────────────────────────────────────────────────────
+ * Semantic heading elements inherit weight from the type scale.
+ * Components apply specific --text-{scale} utilities.
+ * ─────────────────────────────────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  /* Prevent orphaned single words on the last line of headlines */
+  text-wrap: balance;
+}
+
+p {
+  /* Prevent orphaned single words in body paragraphs */
+  text-wrap: pretty;
+}
+
+/* ─── Fluid Display Type ───────────────────────────────────────────────────────
+ * The hero headline (text-display) scales fluidly between mobile (40px)
+ * and desktop (72px) without a hard breakpoint jump.
+ * h1 also scales: mobile 32px → desktop 48px.
+ *
+ * Applied via utility class in the component, overrides the static @theme value.
+ * ─────────────────────────────────────────────────────────────────────────── */
+.text-display-fluid {
+  font-size: clamp(2.5rem, 5.5vw, 4.5rem);   /* 40px → 72px */
+  line-height: 1.05;
+  font-weight: 600;
+}
+
+.text-h1-fluid {
+  font-size: clamp(2rem, 4vw, 3rem);          /* 32px → 48px */
+  line-height: 1.1;
+  font-weight: 600;
+}
+
+/* ─── Skip-to-content Link ─────────────────────────────────────────────────────
+ * Visible only on keyboard focus — prerequisite for keyboard navigation.
+ * ─────────────────────────────────────────────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: var(--color-accent);
+  color: #FFFFFF;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: top 0.1s;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* ─── Focus Styles ─────────────────────────────────────────────────────────────
+ * Global focus-visible treatment — applied to all interactive elements.
+ * Individual components may refine this (form inputs use a border treatment).
+ * ─────────────────────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* Remove focus ring for mouse users — only show for keyboard navigation */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ─── Reduced Motion ───────────────────────────────────────────────────────────
+ * CSS-level reduced motion — catches elements that may not go through Framer
+ * Motion (CSS transitions on hover states, etc.).
+ * Framer Motion's useReducedMotion() handles JS animations separately.
+ * ─────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── Screen-reader Only Utility ───────────────────────────────────────────────
+ * For elements visible to screen readers but hidden visually.
+ * Used for the hero visual description and other accessible-only content.
+ * ─────────────────────────────────────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ─── Typography — Font Weight Bindings (D2 fix) ───────────────────────────────
+ * Tailwind v4 does not auto-apply font-weight via --text-*--line-height sub-
+ * properties. These @layer base rules bind each text-scale utility to its
+ * documented weight (docs/04-design-system.md §3.2).
+ *
+ * @layer base has lower cascade priority than @layer utilities, so Tailwind's
+ * font-{weight} utilities (font-normal, font-semibold, etc.) still override
+ * these defaults when a component author needs to deviate intentionally.
+ * ─────────────────────────────────────────────────────────────────────────── */
+@layer base {
+  .text-display,
+  .text-display-fluid  { font-weight: 600; }
+
+  .text-h1,
+  .text-h1-fluid       { font-weight: 600; }
+
+  .text-h2             { font-weight: 600; }
+  .text-h3             { font-weight: 500; }
+  .text-body-lg        { font-weight: 400; }
+  .text-body           { font-weight: 400; }
+  .text-caption        { font-weight: 500; }
+  .text-mono-tag       { font-weight: 500; }
+}
+
+/* ─── Letter Spacing for Section Labels ────────────────────────────────────────
+ * Uppercase section labels (eyebrow text) use a small positive letter-spacing.
+ * Applied as a utility class alongside text-caption in SectionLabel component.
+ * ─────────────────────────────────────────────────────────────────────────── */
+.tracking-label {
+  letter-spacing: 0.08em;
+}
