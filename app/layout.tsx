@@ -21,22 +21,22 @@ export const metadata: Metadata = {
     description: META.ogDescription,
     images: [
       {
-        url: 'https://cnvrted.com/opengraph-image',
+        url: 'https://www.cnvrted.com/opengraph-image',
         width: 1200,
         height: 630,
         alt: META.ogImageAlt,
       },
     ],
     type: 'website',
-    url: 'https://cnvrted.com',
+    url: 'https://www.cnvrted.com',
   },
   twitter: {
     card: 'summary_large_image',
     title: META.ogTitle,
     description: META.ogDescription,
-    images: ['https://cnvrted.com/opengraph-image'],
+    images: ['https://www.cnvrted.com/opengraph-image'],
   },
-  metadataBase: new URL('https://cnvrted.com'),
+  metadataBase: new URL('https://www.cnvrted.com'),
   robots: {
     index: true,
     follow: true,
