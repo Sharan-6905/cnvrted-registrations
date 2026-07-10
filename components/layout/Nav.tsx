@@ -67,7 +67,7 @@ export function Nav() {
 
         {/* ── Join our Slack — visible at every viewport width ───────────── */}
         <a
-          href="https://join.slack.com/t/cnvrted/shared_invite/zt-4095523xy-~cLpdY4E3fhQ4_cKvUo8Ug"
+          href="https://join.slack.com/t/cnvrted/shared_invite/zt-4388qsrbr-x~RlkFSChnmWY7JojhV1fA"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 text-body text-text-secondary hover:text-text-primary transition-colors duration-[110ms] border border-border rounded-full px-4 py-1.5 hover:border-text-secondary shrink-0"
