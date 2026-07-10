@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
   }
 
-  const { error } = await supabase.from('questionnaire_responses').insert({
+  const { error } = await getSupabase().from('questionnaire_responses').insert({
     name: name.trim(),
     phone: phone.trim(),
     email: email.trim(),
