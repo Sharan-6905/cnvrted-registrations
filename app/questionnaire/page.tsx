@@ -30,8 +30,10 @@ export default function QuestionnairePage() {
           <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-10 lg:px-20">
             <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,360px)_minmax(0,640px)] lg:justify-between gap-10 lg:gap-16">
 
-              {/* Left rail — sticky context, fills the space a bare centered form would waste on wide screens */}
-              <div className="hidden lg:block lg:sticky lg:top-32 lg:self-start">
+              {/* Context rail — stacks above the form on mobile/tablet as a card;
+                  becomes a sticky side rail at lg: to fill the space a bare
+                  centered form would waste on wide screens. */}
+              <div className="rounded-lg border border-border bg-surface p-6 md:p-8 lg:border-0 lg:bg-transparent lg:p-0 lg:sticky lg:top-32 lg:self-start">
                 <SectionLabel className="mb-4">Why we ask</SectionLabel>
                 <h2 className="text-h2 font-semibold text-text-primary mb-4 leading-tight">
                   Five short steps. Nothing wasted.
