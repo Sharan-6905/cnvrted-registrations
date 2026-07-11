@@ -2,6 +2,7 @@
 
 import { useId, useState } from 'react'
 import { SectionLabel } from '@/components/ui/SectionLabel'
+import { validateEmail } from '@/lib/emailValidation'
 
 const TEAM_SIZES = ['Just me', '2–10', '11–50', '51–200', '200+']
 const URGENCY_OPTIONS = ['Actively looking', 'Exploring', 'Just curious']
@@ -112,8 +113,9 @@ export function QuestionnaireForm() {
       setError('Please fill in the required fields.')
       return
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setError('Enter a valid email address.')
+    const emailCheck = validateEmail(email)
+    if (!emailCheck.valid) {
+      setError(emailCheck.reason ?? 'Enter a valid email address.')
       return
     }
     setError(null)
