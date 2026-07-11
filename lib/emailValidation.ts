@@ -37,7 +37,9 @@ function isGibberish(localPart: string): boolean {
   return false
 }
 
-export function validateEmail(rawEmail: string): { valid: boolean; reason?: string } {
+// Fast, free, no network call — safe to run on the client for instant
+// feedback. Catches obvious junk before spending deliverability-API quota.
+export function validateEmailFormat(rawEmail: string): { valid: boolean; reason?: string } {
   const email = rawEmail.trim().toLowerCase()
 
   if (!EMAIL_FORMAT.test(email)) {
@@ -55,4 +57,59 @@ export function validateEmail(rawEmail: string): { valid: boolean; reason?: stri
   }
 
   return { valid: true }
+}
+
+interface AbstractApiResponse {
+  deliverability?: 'DELIVERABLE' | 'UNDELIVERABLE' | 'UNKNOWN'
+  is_valid_format?: { value: boolean }
+  is_disposable_email?: { value: boolean }
+  is_smtp_valid?: { value: boolean }
+  is_mx_found?: { value: boolean }
+}
+
+// Real-time mailbox check — calls Abstract API's Email Validation endpoint.
+// Server-only: never call this from client code, it uses a secret API key.
+// Fails OPEN (treats the email as valid) on network errors, missing key, or
+// rate-limit responses, so a third-party outage never blocks submissions —
+// it only rejects when the API gives a confident "undeliverable" verdict.
+export async function verifyEmailDeliverability(
+  rawEmail: string
+): Promise<{ valid: boolean; reason?: string }> {
+  const apiKey = process.env.ABSTRACT_EMAIL_API_KEY
+  if (!apiKey) {
+    console.warn('ABSTRACT_EMAIL_API_KEY not set — skipping deliverability check.')
+    return { valid: true }
+  }
+
+  const email = rawEmail.trim().toLowerCase()
+
+  try {
+    const res = await fetch(
+      `https://emailvalidation.abstractapi.com/v1/?api_key=${apiKey}&email=${encodeURIComponent(email)}`,
+      { signal: AbortSignal.timeout(5000) }
+    )
+
+    if (!res.ok) {
+      console.warn(`Abstract API returned ${res.status} — failing open.`)
+      return { valid: true }
+    }
+
+    const data = (await res.json()) as AbstractApiResponse
+
+    if (data.is_disposable_email?.value) {
+      return { valid: false, reason: 'Please use a real, non-disposable email address.' }
+    }
+
+    if (data.deliverability === 'UNDELIVERABLE') {
+      return { valid: false, reason: 'This email address doesn\'t appear to exist — please double-check it.' }
+    }
+
+    // deliverability === 'UNKNOWN' or 'DELIVERABLE' — accept both. UNKNOWN
+    // usually means the receiving mail server blocks verification probes
+    // (common for gmail.com, outlook.com), not that the address is fake.
+    return { valid: true }
+  } catch (err) {
+    console.warn('Abstract API request failed — failing open.', err)
+    return { valid: true }
+  }
 }
