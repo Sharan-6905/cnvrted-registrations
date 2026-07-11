@@ -59,15 +59,20 @@ export function validateEmailFormat(rawEmail: string): { valid: boolean; reason?
   return { valid: true }
 }
 
+// Shape of Abstract API's Email Reputation endpoint response
+// (https://app.abstractapi.com/api/email-reputation) — nested, richer than
+// their older Email Validation API. Only the fields we actually use are typed.
 interface AbstractApiResponse {
-  deliverability?: 'DELIVERABLE' | 'UNDELIVERABLE' | 'UNKNOWN'
-  is_valid_format?: { value: boolean }
-  is_disposable_email?: { value: boolean }
-  is_smtp_valid?: { value: boolean }
-  is_mx_found?: { value: boolean }
+  email_deliverability?: {
+    status?: 'deliverable' | 'undeliverable' | 'unknown'
+    is_format_valid?: boolean
+  }
+  email_quality?: {
+    is_disposable?: boolean
+  }
 }
 
-// Real-time mailbox check — calls Abstract API's Email Validation endpoint.
+// Real-time mailbox check — calls Abstract API's Email Reputation endpoint.
 // Server-only: never call this from client code, it uses a secret API key.
 // Fails OPEN (treats the email as valid) on network errors, missing key, or
 // rate-limit responses, so a third-party outage never blocks submissions —
@@ -85,7 +90,7 @@ export async function verifyEmailDeliverability(
 
   try {
     const res = await fetch(
-      `https://emailvalidation.abstractapi.com/v1/?api_key=${apiKey}&email=${encodeURIComponent(email)}`,
+      `https://emailreputation.abstractapi.com/v1/?api_key=${apiKey}&email=${encodeURIComponent(email)}`,
       { signal: AbortSignal.timeout(5000) }
     )
 
@@ -96,17 +101,17 @@ export async function verifyEmailDeliverability(
 
     const data = (await res.json()) as AbstractApiResponse
 
-    if (data.is_disposable_email?.value) {
+    if (data.email_quality?.is_disposable) {
       return { valid: false, reason: 'Please use a real, non-disposable email address.' }
     }
 
-    if (data.deliverability === 'UNDELIVERABLE') {
+    if (data.email_deliverability?.status === 'undeliverable') {
       return { valid: false, reason: 'This email address doesn\'t appear to exist — please double-check it.' }
     }
 
-    // deliverability === 'UNKNOWN' or 'DELIVERABLE' — accept both. UNKNOWN
-    // usually means the receiving mail server blocks verification probes
-    // (common for gmail.com, outlook.com), not that the address is fake.
+    // status === 'unknown' or 'deliverable' — accept both. 'unknown' usually
+    // means the receiving mail server blocks verification probes (common
+    // for gmail.com, outlook.com), not that the address is fake.
     return { valid: true }
   } catch (err) {
     console.warn('Abstract API request failed — failing open.', err)
