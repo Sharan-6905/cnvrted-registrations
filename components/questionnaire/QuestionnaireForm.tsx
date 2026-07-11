@@ -320,13 +320,13 @@ export function QuestionnaireForm({ slackUrl }: { slackUrl: string }) {
 
           <div>
             <label className="field-label" htmlFor="email">
-              Work email
+              Email
             </label>
             <input
               id="email"
               type="email"
               autoComplete="email"
-              placeholder="you@company.com"
+              placeholder="you@example.com"
               className="field-input"
               aria-invalid={errors.email ? true : undefined}
               aria-describedby={errors.email ? "email-error" : undefined}

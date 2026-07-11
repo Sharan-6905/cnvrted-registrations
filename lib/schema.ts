@@ -1,21 +1,5 @@
 import { z } from "zod";
 
-/** Free providers we reject for the work-email field. */
-const FREE_EMAIL_DOMAINS = new Set([
-  "gmail.com",
-  "googlemail.com",
-  "yahoo.com",
-  "yahoo.co.in",
-  "yahoo.co.uk",
-  "outlook.com",
-  "hotmail.com",
-  "live.com",
-  "msn.com",
-  "proton.me",
-  "protonmail.com",
-  "pm.me",
-]);
-
 export const TEAM_SIZES = ["Just me", "2–10", "11–50", "51–200", "200+"] as const;
 
 export const SALES_TOOLS = [
@@ -54,10 +38,7 @@ export const questionnaireSchema = z.object({
     .string()
     .trim()
     .toLowerCase()
-    .email("That does not look like an email address.")
-    .refine((v) => !FREE_EMAIL_DOMAINS.has(v.split("@")[1] ?? ""), {
-      message: "Use your work email — we route this to your team's onboarding.",
-    }),
+    .email("That does not look like an email address."),
 
   // Step 2 — where you work
   company: optionalText,
