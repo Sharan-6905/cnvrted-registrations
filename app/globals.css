@@ -1,323 +1,606 @@
 @import "tailwindcss";
 
-/**
- * CNVRTED Design System — Global Styles
- *
- * Architecture (Tailwind v4):
- *   @theme inline  →  defines all design tokens as CSS custom properties AND
- *                     generates Tailwind utility classes that reference them.
- *                     Because @theme inline is used (not @theme), utilities
- *                     output var(--token) references, enabling runtime overrides.
- *
- *   [data-theme="dark"]  →  overrides the relevant --color-* and --color-accent
- *                            variables for the How It Works dark section. All
- *                            components using bg-background, text-text-primary etc.
- *                            automatically use dark values inside this attribute.
- *                            No Tailwind dark: prefix needed anywhere.
- *
- * Token naming follows the design system (docs/04-design-system.md).
- * No raw hex values appear in component files — only token names via Tailwind utilities
- * or var(--token-name) in the rare case of inline styles.
- */
+/* ---------------------------------------------------------------------------
+   Design tokens — mirrored from lib/tokens.ts (source of truth)
+--------------------------------------------------------------------------- */
+:root {
+  --bg-page: #0a0a0a;
+  --bg-section: #171717;
+  --bg-card: #1c1c1c;
 
-/* ─── Tailwind v4 Deviation Note ──────────────────────────────────────────────
- * The implementation plan specified tailwind.config.ts (v3 syntax).
- * create-next-app@latest installed Tailwind v4, which replaces the JS config
- * file with @theme directives in CSS. The resulting architecture is cleaner:
- * - CSS custom properties and Tailwind utilities share a single definition
- * - No var() indirection needed in a separate config file
- * - @theme inline means dark-section overrides work via CSS cascade alone
- * All token names, hex values, and utility class semantics are identical to
- * the plan. The file that changed is this one (globals.css), not the design system.
- * ──────────────────────────────────────────────────────────────────────────── */
+  --surface-input: rgba(255, 255, 255, 0.03);
+  --surface-chip: rgba(255, 255, 255, 0.06);
+
+  --border-hairline: rgba(255, 255, 255, 0.08);
+  --border-input: rgba(255, 255, 255, 0.1);
+  --border-input-hover: rgba(255, 255, 255, 0.16);
+  --border-input-focus: rgba(255, 255, 255, 0.35);
+  --border-ghost: rgba(255, 255, 255, 0.12);
+
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1a1;
+  --text-tertiary: #6b6b6b;
+  --text-on-primary: #0a0a0a;
+
+  --error: #e5484d;
+  --glow: rgba(120, 140, 180, 0.14);
+  --focus-ring: 0 0 0 4px rgba(255, 255, 255, 0.06);
+
+  --radius-card: 14px;
+  --radius-pill: 9999px;
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 200ms;
+  --dur: 240ms;
+  --dur-slow: 260ms;
+
+  color-scheme: dark;
+}
 
 @theme inline {
-
-  /* ── Fonts ─────────────────────────────────────────────────────────────── */
+  --color-background: var(--bg-page);
+  --color-foreground: var(--text-primary);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
-
-  /* ── Color — Light Mode ─────────────────────────────────────────────────── */
-  --color-background:          #FAF8F4;   /* Warm cream */
-  --color-surface:             #F2EFE9;   /* Slightly deeper cream for card backgrounds */
-  --color-surface-raised:      #FFFFFF;   /* Pure white for elevated card faces */
-  --color-border:              #E4DFD6;   /* Warm grey border */
-
-  --color-text-primary:        #0D1210;   /* Warm near-black */
-  --color-text-secondary:      #4A5250;   /* Warm mid-grey */
-  --color-text-tertiary:       #8A9490;   /* Muted label grey */
-
-  --color-accent:              #0B6B66;   /* Deep teal */
-  --color-accent-hover:        #085c57;   /* 10% darker for hover */
-  --color-accent-link:         #085c57;
-  --color-accent-dim:          #E6F4F1;   /* Mint tint for tag/badge backgrounds */
-
-  --color-intent-high-bg:      #0B6B66;   /* Solid teal for HIGH INTENT badge */
-  --color-intent-high-text:    #FFFFFF;
-  --color-intent-medium-bg:    #FEF3E2;   /* Warm amber tint for MEDIUM INTENT */
-  --color-intent-medium-text:  #92540A;
-
-  --color-success:             #1E9E6B;
-  --color-error:               #D93025;
-
-  /* ── Color — Dark Section Palette ──────────────────────────────────────── */
-  --color-dark-bg:             #031B1D;   /* Reference dark teal-black */
-  --color-dark-surface:        #0A2527;
-  --color-dark-border:         #1A3A3D;
-  --color-dark-text-primary:   #F0F5F4;
-  --color-dark-text-secondary: #8AADA9;
-  --color-dark-text-tertiary:  #4A6A67;
-  --color-accent-dark:         #2CC4BB;   /* Brightened teal for dark bg contrast */
-
-  /* ── Typography — Type Scale ────────────────────────────────────────────── */
-  /* Tailwind v4: --text-* sets font-size; --text-*--line-height is auto-applied.
-     Font-weight is NOT a supported sub-property — see @layer base block below.
-     h2 through mono-tag use clamp() for fluid mobile→desktop scaling (D3 fix).
-     text-display and text-h1 are static desktop values; components that need
-     responsive display/h1 sizing use .text-display-fluid / .text-h1-fluid. */
-
-  --text-display:           4.5rem;                                         /* 72px — static */
-  --text-display--line-height: 1.05;
-
-  --text-h1:                3rem;                                            /* 48px — static */
-  --text-h1--line-height:   1.1;
-
-  /* clamp(mobile, fluid, desktop) — breakpoints: 375px → 1280px */
-  --text-h2:                clamp(1.625rem, calc(1.1vw + 1.37rem), 2.25rem);   /* 26px → 36px */
-  --text-h2--line-height:   1.15;
-
-  --text-h3:                clamp(1.25rem, calc(0.44vw + 1.15rem), 1.5rem);    /* 20px → 24px */
-  --text-h3--line-height:   1.25;
-
-  --text-body-lg:           clamp(1.0625rem, calc(0.22vw + 1rem), 1.1875rem);  /* 17px → 19px */
-  --text-body-lg--line-height: 1.55;
-
-  --text-body:              clamp(0.9375rem, calc(0.11vw + 0.91rem), 1rem);    /* 15px → 16px */
-  --text-body--line-height: 1.6;
-
-  --text-caption:           clamp(0.75rem, calc(0.11vw + 0.72rem), 0.8125rem); /* 12px → 13px */
-  --text-caption--line-height: 1.4;
-
-  --text-mono-tag:          clamp(0.6875rem, calc(0.11vw + 0.66rem), 0.75rem); /* 11px → 12px */
-  --text-mono-tag--line-height: 1.3;
-
-  /* ── Border Radius ──────────────────────────────────────────────────────── */
-  /* Tailwind v4: --radius-* maps to rounded-{name} utility */
-  --radius-sm:    0.25rem;   /* 4px  — small interactive elements */
-  --radius-md:    0.5rem;    /* 8px  — buttons, tags, badges */
-  --radius-card:  0.75rem;   /* 12px — signal cards (distinct component) */
-  --radius-lg:    1rem;      /* 16px — general content cards, form containers */
-  --radius-xl:    1.5rem;    /* 24px — large containers (not on homepage) */
-
-  /* ── Shadows ─────────────────────────────────────────────────────────────── */
-  /* Tailwind v4: --shadow-* maps to shadow-{name} utility */
-  --shadow-card:       0px 2px 12px rgba(0, 0, 0, 0.06);
-  --shadow-card-hover: 0px 6px 20px rgba(0, 0, 0, 0.10);
-
-  /* ── Spacing — Semantic Scale (8px base — docs/04-design-system.md §4.1) ─── */
-  /* Generates Tailwind utilities: p-{name}, m-{name}, gap-{name}, w-{name}, etc. */
-  /* Components reference these by name — never raw px or arbitrary values.        */
-  --spacing-xs:   0.25rem;   /*   4px — icon margins, hairline gaps */
-  --spacing-sm:   0.5rem;    /*   8px — compact gaps, small internal padding */
-  --spacing-md:   0.75rem;   /*  12px — tag/badge padding, tight component gaps */
-  --spacing-lg:   1rem;      /*  16px — standard component internal padding */
-  --spacing-xl:   1.5rem;    /*  24px — comfortable content spacing, card padding */
-  --spacing-2xl:  2rem;      /*  32px — between sibling components */
-  --spacing-3xl:  3rem;      /*  48px — section sub-rhythm, generous gaps */
-  --spacing-4xl:  4rem;      /*  64px — section-mobile vertical padding */
-  --spacing-5xl:  6rem;      /*  96px — large layout separations */
-  --spacing-6xl:  8rem;      /* 128px — section-desktop vertical padding */
-  --spacing-7xl:  12rem;     /* 192px — hero min-height, maximum layout gaps */
-
-  /* ── Spacing — Context Aliases ──────────────────────────────────────────── */
-  /* Named aliases for readability at the section/layout level.                  */
-  --spacing-section-desktop:  8rem;    /* 128px = spacing-6xl */
-  --spacing-section-tablet:   5rem;    /* 80px  — no direct alias in base scale */
-  --spacing-section-mobile:   4rem;    /* 64px  = spacing-4xl */
-  --spacing-container-x:      5rem;    /* 80px  — outer horizontal margin, desktop */
-  --spacing-container-x-sm:   1.5rem;  /* 24px  = spacing-xl — mobile */
-
-}
-
-/* ─── Dark Section Token Override ─────────────────────────────────────────────
- * Applied to the How It Works section via data-theme="dark".
- * All standard --color-* tokens are reassigned to their dark-palette equivalents.
- * Components inside this element use bg-background, text-text-primary, etc.
- * unchanged — they automatically resolve to dark values via CSS cascade.
- * ─────────────────────────────────────────────────────────────────────────── */
-[data-theme="dark"] {
-  --color-background:     #031B1D;
-  --color-surface:        #0A2527;
-  --color-surface-raised: #0F2E31;
-  --color-border:         #1A3A3D;
-
-  --color-text-primary:   #F0F5F4;
-  --color-text-secondary: #8AADA9;
-  --color-text-tertiary:  #4A6A67;
-
-  --color-accent:         #2CC4BB;
-  --color-accent-link:    #2CC4BB;
-  --color-accent-dim:     rgba(44, 196, 187, 0.12);
-}
-
-/* ─── Base Reset ───────────────────────────────────────────────────────────────
- * Minimal — Tailwind's preflight handles most resets.
- * Only additions that Tailwind v4 preflight does not cover.
- * ─────────────────────────────────────────────────────────────────────────── */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
 }
 
 html {
-  /* Smooth scroll for anchor navigation (nav links → sections).
-     JS smooth-scroll is applied for controlled duration; CSS scroll-behavior
-     handles the rare cases where JS hasn't initialized yet. */
   scroll-behavior: smooth;
-  /* Prevent horizontal overflow on mobile */
-  overflow-x: hidden;
 }
 
 body {
-  background-color: var(--color-background);
-  color: var(--color-text-primary);
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /* Prevent layout shift from scrollbar appearing on content-heavy sections */
-  scrollbar-gutter: stable;
+  text-rendering: optimizeLegibility;
 }
 
-/* ─── Typography Defaults ──────────────────────────────────────────────────────
- * Semantic heading elements inherit weight from the type scale.
- * Components apply specific --text-{scale} utilities.
- * ─────────────────────────────────────────────────────────────────────────── */
-h1, h2, h3, h4, h5, h6 {
-  /* Prevent orphaned single words on the last line of headlines */
-  text-wrap: balance;
+::selection {
+  background: rgba(255, 255, 255, 0.16);
 }
 
-p {
-  /* Prevent orphaned single words in body paragraphs */
-  text-wrap: pretty;
-}
-
-/* ─── Fluid Display Type ───────────────────────────────────────────────────────
- * The hero headline (text-display) scales fluidly between mobile (40px)
- * and desktop (72px) without a hard breakpoint jump.
- * h1 also scales: mobile 32px → desktop 48px.
- *
- * Applied via utility class in the component, overrides the static @theme value.
- * ─────────────────────────────────────────────────────────────────────────── */
-.text-display-fluid {
-  font-size: clamp(2.5rem, 5.5vw, 4.5rem);   /* 40px → 72px */
-  line-height: 1.05;
-  font-weight: 600;
-}
-
-.text-h1-fluid {
-  font-size: clamp(2rem, 4vw, 3rem);          /* 32px → 48px */
-  line-height: 1.1;
-  font-weight: 600;
-}
-
-/* ─── Skip-to-content Link ─────────────────────────────────────────────────────
- * Visible only on keyboard focus — prerequisite for keyboard navigation.
- * ─────────────────────────────────────────────────────────────────────────── */
+/* ---------------------------------------------------------------------------
+   Skip link — first focusable element; visible only on keyboard focus
+--------------------------------------------------------------------------- */
 .skip-link {
   position: absolute;
   top: -100%;
   left: 1rem;
-  z-index: 9999;
+  z-index: 100;
   padding: 0.5rem 1rem;
-  background: var(--color-accent);
-  color: #FFFFFF;
+  background: var(--text-primary);
+  color: var(--text-on-primary);
+  font-size: 14px;
   font-weight: 500;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-pill);
   text-decoration: none;
-  transition: top 0.1s;
 }
 
 .skip-link:focus {
   top: 1rem;
 }
 
-/* ─── Focus Styles ─────────────────────────────────────────────────────────────
- * Global focus-visible treatment — applied to all interactive elements.
- * Individual components may refine this (form inputs use a border treatment).
- * ─────────────────────────────────────────────────────────────────────────── */
-:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 3px;
-  border-radius: var(--radius-sm);
+/* ---------------------------------------------------------------------------
+   Atmosphere — one static glow, a masked dot grid, and film grain.
+   Nothing moves, nothing pulses.
+--------------------------------------------------------------------------- */
+.ambient-glow {
+  position: absolute;
+  top: -160px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1100px, 140vw);
+  height: 900px;
+  background: radial-gradient(closest-side, var(--glow), transparent 70%);
+  filter: blur(160px);
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Remove focus ring for mouse users — only show for keyboard navigation */
-:focus:not(:focus-visible) {
+.hero-grid {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 720px;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.4) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+  opacity: 0.05;
+  mask-image: radial-gradient(
+    ellipse 70% 55% at 50% 18%,
+    black,
+    transparent 72%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 55% at 50% 18%,
+    black,
+    transparent 72%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* ---------------------------------------------------------------------------
+   Surfaces — the glass card's edge is a gradient border that catches the
+   light at the top. Borders, never shadows, define edges.
+--------------------------------------------------------------------------- */
+.card-glass {
+  position: relative;
+  z-index: 1;
+  background: rgba(26, 26, 26, 0.62);
+  border-radius: var(--radius-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.card-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.06) 22%,
+    rgba(255, 255, 255, 0.06) 78%,
+    rgba(255, 255, 255, 0.1)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.card-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04),
+    transparent 140px
+  );
+  pointer-events: none;
+}
+
+/* Card content sits above the sheen. */
+.card-glass > * {
+  position: relative;
+  z-index: 1;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 13px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-chip);
+  border: 1px solid var(--border-input);
+  font-size: 12px;
+  font-weight: 450;
+  letter-spacing: 0.01em;
+  color: var(--text-secondary);
+}
+
+.chip-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  flex: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Type
+--------------------------------------------------------------------------- */
+.h1 {
+  font-size: clamp(34px, 5.2vw, 56px);
+  font-weight: 450;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+
+.h1-muted {
+  color: var(--text-tertiary);
+}
+
+.section-heading {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.field-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 450;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.helper-text {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+.error-text {
+  font-size: 13px;
+  color: var(--error);
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------
+   Inputs
+--------------------------------------------------------------------------- */
+.field-input {
+  width: 100%;
+  background: var(--surface-input);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-card);
+  color: var(--text-primary);
+  caret-color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 12px 15px;
+  scroll-margin-top: 96px;
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
   outline: none;
 }
 
-/* ─── Reduced Motion ───────────────────────────────────────────────────────────
- * CSS-level reduced motion — catches elements that may not go through Framer
- * Motion (CSS transitions on hover states, etc.).
- * Framer Motion's useReducedMotion() handles JS animations separately.
- * ─────────────────────────────────────────────────────────────────────────── */
+.field-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.field-input:hover {
+  border-color: var(--border-input-hover);
+}
+
+.field-input:focus {
+  border-color: var(--border-input-focus);
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: var(--focus-ring);
+}
+
+.field-input[aria-invalid="true"] {
+  border-color: rgba(229, 72, 77, 0.55);
+}
+
+textarea.field-input {
+  resize: vertical;
+}
+
+/* Keep autofill from flashing white on the dark surface. */
+input.field-input:-webkit-autofill,
+input.field-input:-webkit-autofill:hover,
+input.field-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #161616 inset;
+  -webkit-text-fill-color: var(--text-primary);
+  caret-color: var(--text-primary);
+  transition: background-color 9999s ease-out;
+}
+
+/* ---------------------------------------------------------------------------
+   Pills — radios and multi-select chips. Hidden input, styled label.
+--------------------------------------------------------------------------- */
+.pill-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 16px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-input);
+  border: 1px solid var(--border-input);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 450;
+  cursor: pointer;
+  user-select: none;
+  scroll-margin-top: 96px;
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+
+.pill-option:hover {
+  border-color: var(--border-ghost);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.pill-option:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.pill-option:has(input:checked) {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  color: var(--text-on-primary);
+}
+
+.pill-option:has(input:focus-visible) {
+  border-color: var(--border-input-focus);
+  box-shadow: var(--focus-ring);
+}
+
+.pill-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Buttons
+--------------------------------------------------------------------------- */
+.btn-primary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 28px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(180deg, #ffffff, #e9e9e9);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: var(--text-on-primary);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    transform var(--dur-fast) var(--ease),
+    filter var(--dur-fast) var(--ease);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.04);
+  transform: scale(1.01);
+}
+
+.btn-primary:active {
+  transform: scale(0.99);
+}
+
+.btn-primary:focus-visible {
+  outline: none;
+  border-color: var(--border-input-focus);
+  box-shadow:
+    var(--focus-ring),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.btn-primary[data-loading="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.9) 50%,
+    transparent 65%
+  );
+  transform: translateX(-100%);
+  animation: shimmer 900ms var(--ease) 1 forwards;
+}
+
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  border: 1px solid var(--border-ghost);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 450;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+
+.btn-ghost:hover {
+  border-color: var(--border-input-focus);
+  background: var(--surface-input);
+  transform: translateY(-1px);
+}
+
+.btn-ghost:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-ghost:focus-visible {
+  outline: none;
+  border-color: var(--border-input-focus);
+  box-shadow: var(--focus-ring);
+}
+
+/* ---------------------------------------------------------------------------
+   Step markers — quiet fill is the only progress feedback
+--------------------------------------------------------------------------- */
+.step-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--surface-chip);
+  border: 1px solid var(--border-input);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color var(--dur-slow) var(--ease),
+    border-color var(--dur-slow) var(--ease),
+    color var(--dur-slow) var(--ease);
+}
+
+.step-circle[data-complete="true"] {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  color: var(--text-on-primary);
+}
+
+/* ---------------------------------------------------------------------------
+   Success check — a single quiet draw, 400ms total
+--------------------------------------------------------------------------- */
+.success-check circle {
+  stroke-dasharray: 151;
+  stroke-dashoffset: 151;
+  animation: draw 400ms var(--ease) forwards;
+}
+
+.success-check path {
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+  animation: draw 300ms var(--ease) 200ms forwards;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Conditional reveal — smooth height, no layout jump
+--------------------------------------------------------------------------- */
+.reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--dur-slow) var(--ease);
+}
+
+.reveal[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+
+.reveal > div {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Load-in motion — fade up 12px, staggered 60ms
+--------------------------------------------------------------------------- */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  opacity: 0;
+  animation: fade-up var(--dur-slow) var(--ease) forwards;
+}
+
+.fade-up-1 { animation-delay: 0ms; }
+.fade-up-2 { animation-delay: 60ms; }
+.fade-up-3 { animation-delay: 120ms; }
+.fade-up-4 { animation-delay: 180ms; }
+.fade-up-5 { animation-delay: 240ms; }
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fade-in var(--dur-slow) var(--ease) both;
+}
+
+/* ---------------------------------------------------------------------------
+   Hairlines — flat at the page level, gradient inside the card
+--------------------------------------------------------------------------- */
+.hairline-b { border-bottom: 1px solid var(--border-hairline); }
+.hairline-t { border-top: 1px solid var(--border-hairline); }
+
+.divider-soft {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.09) 18%,
+    rgba(255, 255, 255, 0.09) 82%,
+    transparent
+  );
+}
+
+/* ---------------------------------------------------------------------------
+   Footer wordmark — giant, half-cropped, outlined. Static.
+--------------------------------------------------------------------------- */
+.footer-wordmark {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.09);
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion
+--------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
-}
-
-/* ─── Screen-reader Only Utility ───────────────────────────────────────────────
- * For elements visible to screen readers but hidden visually.
- * Used for the hero visual description and other accessible-only content.
- * ─────────────────────────────────────────────────────────────────────────── */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
-/* ─── Typography — Font Weight Bindings (D2 fix) ───────────────────────────────
- * Tailwind v4 does not auto-apply font-weight via --text-*--line-height sub-
- * properties. These @layer base rules bind each text-scale utility to its
- * documented weight (docs/04-design-system.md §3.2).
- *
- * @layer base has lower cascade priority than @layer utilities, so Tailwind's
- * font-{weight} utilities (font-normal, font-semibold, etc.) still override
- * these defaults when a component author needs to deviate intentionally.
- * ─────────────────────────────────────────────────────────────────────────── */
-@layer base {
-  .text-display,
-  .text-display-fluid  { font-weight: 600; }
-
-  .text-h1,
-  .text-h1-fluid       { font-weight: 600; }
-
-  .text-h2             { font-weight: 600; }
-  .text-h3             { font-weight: 500; }
-  .text-body-lg        { font-weight: 400; }
-  .text-body           { font-weight: 400; }
-  .text-caption        { font-weight: 500; }
-  .text-mono-tag       { font-weight: 500; }
-}
-
-/* ─── Letter Spacing for Section Labels ────────────────────────────────────────
- * Uppercase section labels (eyebrow text) use a small positive letter-spacing.
- * Applied as a utility class alongside text-caption in SectionLabel component.
- * ─────────────────────────────────────────────────────────────────────────── */
-.tracking-label {
-  letter-spacing: 0.08em;
 }
