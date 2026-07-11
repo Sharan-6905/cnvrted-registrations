@@ -307,7 +307,6 @@ export function QuestionnaireForm({ slackUrl }: { slackUrl: string }) {
               type="tel"
               inputMode="tel"
               autoComplete="tel"
-              placeholder="+91 98765 43210"
               className="field-input"
               aria-invalid={errors.phone ? true : undefined}
               aria-describedby={errors.phone ? "phone-error" : "phone-helper"}
