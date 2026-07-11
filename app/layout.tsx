@@ -1,13 +1,11 @@
-import type { Metadata } from 'next'
-import { sans, mono } from '@/styles/fonts'
-import { MotionProvider } from '@/components/providers/MotionProvider'
-import { Nav } from '@/components/layout/Nav'
-import { META, UI } from '@/content/copy'
+import type { Metadata, Viewport } from 'next'
+import { sans } from '@/styles/fonts'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: META.title,
-  description: META.description,
+  title: 'CNVRTED - Real-time buying signals for B2B sales teams',
+  description:
+    'Most accounts in your database fit your ICP. Almost none of them are ready to buy right now. CNVRTED shows you which ones are - and exactly why, today.',
   icons: {
     icon: [
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
@@ -17,14 +15,15 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   openGraph: {
-    title: META.ogTitle,
-    description: META.ogDescription,
+    title: 'CNVRTED - Real-time buying signals for B2B sales teams',
+    description:
+      'Stop dialing through contacts that match a profile but show no real sign of intent. CNVRTED surfaces the accounts that are in-market right now, and tells you exactly why.',
     images: [
       {
         url: 'https://register.cnvrted.com/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: META.ogImageAlt,
+        alt: 'CNVRTED - Surface buying intent. Win more deals.',
       },
     ],
     type: 'website',
@@ -32,8 +31,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: META.ogTitle,
-    description: META.ogDescription,
+    title: 'CNVRTED - Real-time buying signals for B2B sales teams',
+    description:
+      'Stop dialing through contacts that match a profile but show no real sign of intent. CNVRTED surfaces the accounts that are in-market right now, and tells you exactly why.',
     images: ['https://register.cnvrted.com/og-image.jpg'],
   },
   metadataBase: new URL('https://register.cnvrted.com'),
@@ -43,16 +43,17 @@ export const metadata: Metadata = {
   },
 }
 
+export const viewport: Viewport = {
+  themeColor: '#0A0A0A',
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${sans.variable} ${mono.variable}`}
-    >
+    <html lang="en" className={`${sans.variable} h-full antialiased`}>
       <head>
         <meta property="og:image" content="https://register.cnvrted.com/og-image.jpg" />
         <meta property="og:image:width" content="1200" />
@@ -61,21 +62,12 @@ export default function RootLayout({
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image" content="https://register.cnvrted.com/og-image.jpg" />
       </head>
-      <body className="min-h-screen antialiased">
-        {/* Skip-to-content — first focusable element in the tab order.
-            Visible only on keyboard focus (CSS: .skip-link in globals.css).
-            Allows keyboard users to bypass the nav and jump to main content. */}
+      <body className="min-h-full font-sans">
+        {/* Skip-to-content — first focusable element in the tab order. */}
         <a href="#main-content" className="skip-link">
-          {UI.skipToContent}
+          Skip to main content
         </a>
-
-        <MotionProvider>
-          {/* Nav is fixed-positioned (z-50) — does not affect document flow.
-              Pages with a hero section render behind the transparent nav.
-              Pages without a hero should add pt-14 md:pt-16 to their first element. */}
-          <Nav />
-          {children}
-        </MotionProvider>
+        {children}
       </body>
     </html>
   )
